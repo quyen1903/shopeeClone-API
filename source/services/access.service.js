@@ -33,25 +33,19 @@ class AccessService{
         if(!foundShop) throw new AuthFailureError('shop not registed');
 
         //create new token pair
-        // const tokens = await createTokenPair({userId,email}, keyStore.publicKey, keyStore.privateKey)
-        const privateKeyBuffer = Buffer.from(privateKey, "utf-8"); 
-        console.log(privateKeyBuffer)
+        //
 
         const publicKeyObject = crypto.createPublicKey(keyStore.publicKey);
-        const privateKeyObject = crypto.createPrivateKey({
-            key: privateKeyBuffer,
-            format: 'pem', 
-            type: 'pkcs1'
-        });
+        const privateKeyObject = crypto.createPrivateKey(privateKey);
 
         const tokens = await createTokenPair({userId,email},publicKeyObject, privateKeyObject)
         console.log('this is tokens',tokens)
         //update token
         await keyStore.updateOne({
-            $set:{//replace value of field with specific value
+            $set:{
                 refreshToken:tokens.refreshToken
             },
-            $addToSet:{//adds a value to an array unless the value is already present, in which case it does nothing to array
+            $addToSet:{
                 refreshTokensUsed:refreshToken
             }
         })
@@ -141,6 +135,13 @@ class AccessService{
                 }
             })
 
+            /**
+             * remmember, good implementation not save private key to database
+             * we need to write private key somewhere else
+             * this project is implement to pass string directly to postman request
+             * not import private key from file
+             * but import from file is better solution
+            */
             const tokens = await createTokenPair({userId:newShop._id,email},publicKey,privateKey)
             if(!tokens)throw BadRequestError('create tokens error!!!!!!')
             
