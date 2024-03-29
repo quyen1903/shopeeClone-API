@@ -1,6 +1,6 @@
 'use strict'
 
-const { product,electronic,furniture,clothing } = require('../../models/product.model');
+const { product } = require('../../models/product.model');
 const { getSelectData, unGetSelectData, convertToObjectIdMongodb } = require('../../utils/index')
 
 const findAllDraftsForShop = async( {query, limit, skip} )=>{

@@ -79,6 +79,10 @@ class AccessService{
         const match = (passwordHashed === foundShop.password);
         if(!match) throw new AuthFailureError('wrong password !!!')
         //3
+        /**
+         * re-create key-pair for each workstation
+         * safer, but reduce our perfomance
+         */
         const { privateKey,publicKey } = crypto.generateKeyPairSync('rsa',{
             modulusLength:4096,
             publicKeyEncoding:{
@@ -107,7 +111,7 @@ class AccessService{
         }
     }
 
-    static signUp = async ({name, email, password})=>{
+    static register = async ({name, email, password})=>{
         //check email existed?
         //lean() return pure object js, so everything is faster
         const holderShop = await shopModel.findOne({email}).lean()

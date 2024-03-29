@@ -35,10 +35,10 @@ class AccessController{
             metadata:await AccessService.login(req.body)
         }).send(res)
     }
-    signUp = async(req,res,next)=>{
+    register = async(req,res,next)=>{
         new CREATED({
             message:'registed OK',
-            metadata:await AccessService.signUp(req.body)//invoke AccessService.signUp(req.body) and attach to metadata
+            metadata:await AccessService.register(req.body)//invoke AccessService.signUp(req.body) and attach to metadata
         }).send(res)
     }
 
