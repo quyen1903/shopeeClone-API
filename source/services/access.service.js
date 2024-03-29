@@ -22,7 +22,6 @@ class AccessService{
 
     static handleRefreshToken = async({ keyStore, user, refreshToken, privateKey })=>{
 
-        
         const {userId, email} = user;
         if(keyStore.refreshTokensUsed.includes(refreshToken)){
             await KeyTokenService.deleteKeyById(userId)
@@ -35,20 +34,16 @@ class AccessService{
 
         //create new token pair
         // const tokens = await createTokenPair({userId,email}, keyStore.publicKey, keyStore.privateKey)
-        // console.log('this is Tokens ',tokens)
-        // console.log('this is keystore',keyStore)
-        /**
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-        */
+        const privateKeyBuffer = Buffer.from(privateKey, "utf-8"); 
+        console.log(privateKeyBuffer)
 
-        const privateKeyObject = crypto.createSecretKey(privateKey)
-        const publicKeyObject = crypto.createPublicKey(keyStore.publicKey)
+        const publicKeyObject = crypto.createPublicKey(keyStore.publicKey);
+        const privateKeyObject = crypto.createPrivateKey({
+            key: privateKeyBuffer,
+            format: 'pem', 
+            type: 'pkcs1'
+        });
+
         const tokens = await createTokenPair({userId,email},publicKeyObject, privateKeyObject)
         console.log('this is tokens',tokens)
         //update token
