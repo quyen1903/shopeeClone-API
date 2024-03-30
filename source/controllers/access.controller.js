@@ -13,6 +13,7 @@ class AccessController{
         // }).send(res)
 
         //edited, no need   accessToken 
+        console.log('this is req.body',req.body);
         new SuccessResponse({
             message:'get token success',
             metadata:await AccessService.handleRefreshToken({
@@ -22,6 +23,7 @@ class AccessController{
                 privateKey:req.body.privateKey,
             })
         }).send(res)
+        
     }
     
     logout = async(req,res,next)=>{

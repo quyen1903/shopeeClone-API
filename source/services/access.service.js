@@ -1,13 +1,12 @@
 'use strict'
 
-    const shopModel = require('../models/shop.model');
-    const bcrypt = require('bcrypt');
-    const crypto = require('node:crypto');
-    const KeyTokenService = require('./keyToken.service');
-    const { createTokenPair } = require('../auth/authUtils');
-    const { getInfoData } = require('../utils');
-    const { BadRequestError,ForbiddenError, AuthFailureError } = require('../core/error.response');
-
+const shopModel = require('../models/shop.model');
+const { writeFile, readFile }= require('node:fs/promises');
+const crypto = require('node:crypto');
+const KeyTokenService = require('./keyToken.service');
+const { createTokenPair } = require('../auth/authUtils');
+const { getInfoData } = require('../utils');
+const { BadRequestError,ForbiddenError, AuthFailureError } = require('../core/error.response');
 
 // services //
 const { findByEmail } = require('./shop.service');
@@ -20,20 +19,23 @@ const RoleShop = {
 
 class AccessService{
 
-    static handleRefreshToken = async({ keyStore, user, refreshToken, privateKey })=>{
-
+    static handleRefreshToken = async({ keyStore, user, refreshToken })=>{
+        
         const {userId, email} = user;
         if(keyStore.refreshTokensUsed.includes(refreshToken)){
             await KeyTokenService.deleteKeyById(userId)
             throw new ForbiddenError('Something wrong happended, please relogin')
         }
+
+        console.log('this is email',email)
         if(keyStore.refreshToken !== refreshToken )throw new AuthFailureError('something was wrong happended, please relogin')
 
         const foundShop = await findByEmail({email})
         if(!foundShop) throw new AuthFailureError('shop not registed');
 
-        //create new token pair
-        //
+        const privateKey =await readFile(`${email}_private_key.pem`)
+
+        console.log('this is privatekey', privateKey)
 
         const publicKeyObject = crypto.createPublicKey(keyStore.publicKey);
         const privateKeyObject = crypto.createPrivateKey(privateKey);
@@ -105,6 +107,8 @@ class AccessService{
             userId:foundShop._id,email
         })  
         //5
+        const pemFilePath = `${email}_private_key.pem`;
+        await writeFile(pemFilePath, privateKey);
         return{
             shop:getInfoData({field:['_id','email'],object:foundShop}),
             tokens
@@ -156,12 +160,15 @@ class AccessService{
                 refreshToken:tokens.refreshToken
             })
 
-            if(!keyStore) throw BadRequestError(' createKeyToken Error!!!')
+            if(!keyStore) throw BadRequestError(' createKeyToken Error!!!');
 
+            //write private key to pem file
+            const pemFilePath = `${email}_private_key.pem`;
+            await writeFile(pemFilePath, privateKey);
             return{
                 shop:getInfoData({field:['_id','name'],object:newShop}),
-                privateKey,
-                tokens
+                tokens,
+                privateKeyPath: pemFilePath
             }
         }
         return {

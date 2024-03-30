@@ -1,5 +1,5 @@
 'use strict'
-const { product, clothing, electronic, furniture } = require('../models/product.model');
+const { product, clothing, electronic, furniture, mechanical } = require('../models/product.model');
 const { updateProductById } = require('../models/repository/product.repo');
 const { insertInventory } = require('../models/repository/inventory.repo')
 const { removeUndefinedObject, updateNestedObjectParser } = require('../utils');
@@ -66,12 +66,7 @@ class Clothing extends Product{
     }
 
     async updateProduct( productId ){
-        /*
-            a: undefined
-            b: null
-        */
-        //1 remove attribute null/undefined
-        
+        //1 remove attribute null/undefined    
         const objectParams = removeUndefinedObject(this)//this is the instance of Clothing
         //2 check where we update 
         if(objectParams.product_attributes){
@@ -97,7 +92,7 @@ class Electronics extends Product{
         if(!newElectronic)throw new BadRequestError('create new Electronic Error')
 
         const newProduct = await super.createProduct(newElectronic._id)
-        if(!newProduct) throw new BadRequestError('create new Product error')
+        if(!newProduct) throw new BadRequestError('create new Electronic error')
     }
 
     async updateProduct( productId ){
@@ -123,7 +118,33 @@ class Furniture extends Product{
         if(!newFurniture)throw new BadRequestError('create new Furniture Error')
 
         const newProduct = await super.createProduct(newFurniture._id)
-        if(!newProduct) throw new BadRequestError('create new Product error')
+        if(!newProduct) throw new BadRequestError('create new Furniture error')
+    }
+
+    async updateProduct( productId ){
+        const objectParams = removeUndefinedObject(this)
+        if(objectParams.product_attributes){
+            await updateProductById({
+                productId,
+                payload:updateNestedObjectParser(objectParams.product_attributes),
+                model:furniture
+            })
+        }
+        const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams))
+        return updateProduct
+    }
+}
+
+class Mechanical extends Product{
+    async createProduct(){
+        const newFurniture = await mechanical.create({
+            ...this.product_attributes,
+            product_shop: this.product_shop
+        })
+        if(!newFurniture)throw new BadRequestError('create new Mechanical Error')
+
+        const newProduct = await super.createProduct(newFurniture._id)
+        if(!newProduct) throw new BadRequestError('create new Mechanical error')
     }
 
     async updateProduct( productId ){
@@ -143,5 +164,6 @@ class Furniture extends Product{
 module.exports = {
     Electronics:Electronics,
     Clothing:Clothing,
-    Furniture:Furniture
+    Furniture:Furniture,
+    Mechanical:Mechanical
 }

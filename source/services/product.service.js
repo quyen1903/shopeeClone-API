@@ -11,18 +11,12 @@ const {
     searchProductByUser,
     findAllProducts,
     findProduct,
-    updateProductById,
 } = require('../models/repository/product.repo');
-
-const { insertInventory } = require('../models/repository/inventory.repo')
-
-const { removeUndefinedObject, updateNestedObjectParser } = require('../utils');
 
 /*
     define factory class to create product
 */
 
-console.log('this is strategy',strategy)
 class ProductFactory {
 
     //store product type and their corresponding class references
@@ -74,7 +68,7 @@ class ProductFactory {
     /** 
      * @param { limit = 50} return maximum is 50 nunmber
      * @param { skip = 0 } this means we now skip any item during retrieved
-     * @param { sort='ctime' } orders items by time they was created.
+     * @param { sort='ctime' } orders items  created time
      * @param { {keySearch} } just simply pass keysearch for full text search
      */
     static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}){
@@ -102,7 +96,5 @@ class ProductFactory {
     }
 }
 
-
-ProductFactory.registerProductType(['Clothing', 'Electronics', 'Furniture'])
-console.log('this is our registry',ProductFactory.productRegistry)
+ProductFactory.registerProductType(['Clothing', 'Electronics', 'Furniture']);
 module.exports = ProductFactory
