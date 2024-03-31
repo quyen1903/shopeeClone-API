@@ -27,21 +27,16 @@ class AccessService{
             throw new ForbiddenError('Something wrong happended, please relogin')
         }
 
-        console.log('this is email',email)
         if(keyStore.refreshToken !== refreshToken )throw new AuthFailureError('something was wrong happended, please relogin')
 
-        const foundShop = await findByEmail({email})
+        const foundShop = await findByEmail({email});
         if(!foundShop) throw new AuthFailureError('shop not registed');
 
-        const privateKey =await readFile(`${email}_private_key.pem`)
-
-        console.log('this is privatekey', privateKey)
-
+        const privateKey =await readFile(`keypool/${email}_private_key.pem`);
         const publicKeyObject = crypto.createPublicKey(keyStore.publicKey);
         const privateKeyObject = crypto.createPrivateKey(privateKey);
+        const tokens = await createTokenPair({userId,email},publicKeyObject, privateKeyObject);
 
-        const tokens = await createTokenPair({userId,email},publicKeyObject, privateKeyObject)
-        console.log('this is tokens',tokens)
         //update token
         await keyStore.updateOne({
             $set:{
@@ -107,7 +102,7 @@ class AccessService{
             userId:foundShop._id,email
         })  
         //5
-        const pemFilePath = `${email}_private_key.pem`;
+        const pemFilePath = `keypool/${email}_private_key.pem`;
         await writeFile(pemFilePath, privateKey);
         return{
             shop:getInfoData({field:['_id','email'],object:foundShop}),
@@ -163,7 +158,7 @@ class AccessService{
             if(!keyStore) throw BadRequestError(' createKeyToken Error!!!');
 
             //write private key to pem file
-            const pemFilePath = `${email}_private_key.pem`;
+            const pemFilePath = `keypool/${email}_private_key.pem`;
             await writeFile(pemFilePath, privateKey);
             return{
                 shop:getInfoData({field:['_id','name'],object:newShop}),
