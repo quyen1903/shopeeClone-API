@@ -163,7 +163,6 @@ class AccessService{
             return{
                 shop:getInfoData({field:['_id','name'],object:newShop}),
                 tokens,
-                privateKeyPath: pemFilePath
             }
         }
         return {
