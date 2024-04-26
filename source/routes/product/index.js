@@ -26,4 +26,4 @@ router.post('/unpubish/:id',asyncHandler(productController.unPubishProductByShop
 router.get('/drafts/all',asyncHandler(productController.getAllDraftForShop));
 router.get('/pubished/all',asyncHandler(productController.getAllPublishForShop));
 
-module.exports = router
+module.exports = router 

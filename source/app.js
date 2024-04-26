@@ -15,7 +15,8 @@ app.use(express.urlencoded({
 }));
 //init database
 require('./dbs/init.mongodb');
-
+const initRedis = require('./dbs/init.redisdb');
+initRedis.initRedis()
 //init routes
 app.use('/',require('./routes'))
 //error handling

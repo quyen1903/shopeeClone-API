@@ -18,7 +18,6 @@ const {
 */
 
 class ProductFactory {
-
     //store product type and their corresponding class references
     static productRegistry = {}//key or class
 
@@ -34,7 +33,6 @@ class ProductFactory {
         }
     }
     
-
     /*
         create product of special type
         retrieve class reference for specified product type from productRegistry

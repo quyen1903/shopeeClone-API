@@ -11,10 +11,11 @@ class InventoryService{
         
         const query = { inven_shopId: shopId, inven_productId: productId },
         updateSet = {
+            //$inc increments a field by a special value.
             $inc:{
                 inven_stock: stock
             },
-
+            //$set replace value of field with special value.
             $set:{
                 inven_location: location
             }

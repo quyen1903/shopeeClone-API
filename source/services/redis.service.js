@@ -1,11 +1,12 @@
 'use strict'
-const redis = require('redis');
+
 const { promisify } = require('util');
 const { reservationInventory } = require('../models/repository/inventory.repo');
-const redisClient = redis.createClient()
+const { getRedis } = require('../dbs/init.redisdb')
 
-const pExpire = promisify(redisClient.pExpire).bind(redisClient)
-const setNXAsync = promisify(redisClient.setNX).bind(redisClient)
+const redisClient = getRedis()
+const pExpire = promisify(redisClient.instanceConnect.pexpire).bind(redisClient)
+const setNXAsync = promisify(redisClient.instanceConnect.setnx).bind(redisClient)
 
 const acquireLock = async ( productId, quantity, cartId )=>{
     const key = `lock_v2024_${productId}`
